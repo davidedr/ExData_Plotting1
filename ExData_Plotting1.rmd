@@ -1,0 +1,89 @@
+---
+title: "ExData_Plotting1"
+author: "Davide"
+date: "Thursday, August 07, 2014"
+output: html_document
+---
+
+```{r}
+rm(list = ls())
+setwd('C:/Nuova cartella/Exploratory Data Analysis/ExData_Plotting1')
+```
+
+## Reading the data
+
+Read the data as a data frame object. Specification say that NAs are actually represented as '?' (question marks). From the text file we see file has an header and columns are separated by a semicolon ';'. Date and time values are kept as string, not converted to factors (`as.is = TRUE`).
+```{r}
+df = read.csv('household_power_consumption.txt', sep = ';', header = TRUE, na.strings = '?', as.is = TRUE, colClasses=c("character","character","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
+
+```
+The dataframe is `r dim(df)[1]` x `r dim(df)[2]` sized, i.e. it has `r dim(df)[1]` rows (observations) consisting of `r dim(df)[2]` columns each.
+
+The structure of the data frame is as follows:
+```{r}
+str(df)
+```
+
+And here we can see the first few observations:
+```{r}
+head(df)
+```
+
+Now convert the `Date` column data from `character` to `Date` type ant the `Time` column from `character` to `Time` type. But maybe it's better to add a new column `DateTime` in the data frame to hold kind of a observations' timestamp.
+```{r}
+df$DateTime <- strptime(paste(df$Date, df$Time, sep = " "), format = '%d/%m/%Y %H:%M:%S')  
+df$Date <- as.POSIXct(df$Date, format = '%d/%m/%Y')
+df$Time <- strptime(df$Time, format = '%H:%M:%S')
+```
+
+Now select the data based on requirements:
+```{r}
+date_begin <- '01/02/2007'
+date_begin_date <- as.POSIXct(date_begin, format = '%d/%m/%Y')
+date_end   <- '02/02/2007'
+date_end_date <- as.POSIXct(date_end, format = '%d/%m/%Y')
+
+keep <- df$Date >= date_begin_date & df$Date <= date_end_date
+keep_df <- df[keep, ]  
+```
+
+We are left off with only `r dim(df)[1]`observations.
+
+## Making the plots
+
+### Plot 1
+```{r}
+hist(keep_df$Global_active_power, col = 'red', main = 'Global Active Power', xlab = 'Global Active Power (kilowatts)', xlim = c(0, 6), axes = FALSE)
+axis(side=1, at=c(0, 2, 4, 6), labels=c(0, 2, 4, 6))
+axis(side=2, at=c(0, 200, 400, 600, 800, 1000, 1200))
+```
+
+### Plot 2
+```{r}
+plot(keep_df$DateTime, keep_df$Global_active_power, type = 'l', xlab = '', ylab = 'Global Active Power (kilowatts)')
+```
+
+### Plot 3
+```{r}
+Sys.setlocale("LC_TIME", "English")
+plot(keep_df$DateTime, keep_df$Sub_metering_1, type = 'l', col = 'black', xlab = '', ylab = "Energy sub metering")
+points(keep_df$DateTime, keep_df$Sub_metering_2, type = 'l', col = 'red')
+points(keep_df$DateTime, keep_df$Sub_metering_3, type = 'l', col = 'blue')
+legend('topright', lty = c(1, 1, 1), col = c('black', 'red', 'blue'), legend = c(names(df)[7], names(df)[8], names(df)[9]))
+```
+
+### Plot 4
+```{r}
+Sys.setlocale("LC_TIME", "English")
+par(mfrow = c(2, 2))
+plot(keep_df$DateTime, keep_df$Global_active_power, type = 'l', xlab = '', ylab = 'Global Active Power')
+
+plot(keep_df$DateTime, keep_df$Voltage, type = 'l', xlab = 'datetime', ylab = 'Voltage')
+
+plot(keep_df$DateTime, keep_df$Sub_metering_1, type = 'l', col = 'black', xlab = '',  ylab = "Energy sub metering")
+points(keep_df$DateTime, keep_df$Sub_metering_2, type = 'l', col = 'red')
+points(keep_df$DateTime, keep_df$Sub_metering_3, type = 'l', col = 'blue')
+legend('topright', bty = 'n', lty = c(1, 1, 1), col = c('black', 'red', 'blue'), legend = c(names(df)[7], names(df)[8], names(df)[9]))
+
+plot(keep_df$DateTime, keep_df$Global_reactive_power, type = 'l', xlab = 'datetime', ylab = names(df)[4])
+```
