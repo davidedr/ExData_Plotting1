@@ -1,6 +1,6 @@
 # Clean up and environment setting
 rm(list = ls())
-setwd('C:/Nuova cartella/Exploratory Data Analysis')
+setwd('C:/Nuova cartella/Exploratory Data Analysis/ExData_Plotting1')
 
 #
 source("getdata.R")
@@ -24,6 +24,7 @@ plot(df$DateTime, df$Global_reactive_power, type = 'l', xlab = 'datetime', ylab 
 
 # Compose plot straight into the png Graphics Device
 png (file = 'plot4.png', width = 480, height = 480, units = "px")
+Sys.setlocale('LC_TIME', 'English')
 par(mfrow = c(2, 2))
 plot(df$DateTime, df$Global_active_power, type = 'l', xlab = '', ylab = 'Global Active Power')
 

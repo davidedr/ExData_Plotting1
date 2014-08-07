@@ -1,9 +1,9 @@
 # Clean up and environment setting
 rm(list = ls())
-setwd('C:/Nuova cartella/Exploratory Data Analysis')
+setwd('C:/Nuova cartella/Exploratory Data Analysis/ExData_Plotting1')
 
 #
-source("getdata.R")
+source('getdata.R')
 # get data
 df = getdata()
 
